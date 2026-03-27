@@ -150,9 +150,10 @@ describe("astar — failure state returns empty array (Issue #3 fix)", () => {
   });
 
   // -------------------------------------------------------------------------
-  it("returns [] when start snaps to the same free cell as end (already arrived)", () => {
-    // When start and end map to the exact same grid cell astar returns [].
-    // The agent is already at the target — no movement needed.
+  it("returns a single-waypoint path when start and end snap to the same free cell", () => {
+    // When start and end map to the same grid cell the destination is still
+    // reachable — astar returns the exact target pixel so the movement layer
+    // can make the final fine-grained adjustment.
     const grid = buildNavGrid([]);
 
     // Pick pixel coords that both land in grid cell (4, 4).
@@ -164,8 +165,8 @@ describe("astar — failure state returns empty array (Issue #3 fix)", () => {
 
     const path = astar(sx, sy, ex, ey, grid);
 
-    // Same cell — no waypoints needed.
-    expect(path).toEqual([]);
+    // Same cell — return exact target so the agent can settle onto it.
+    expect(path).toEqual([{ x: ex, y: ey }]);
   });
 });
 
