@@ -1,6 +1,18 @@
 const crypto = require("node:crypto");
 
 
+const createServer = () =>
+  http.createServer((req, res) => {
+    // Allow Railway health checks through
+    if (req.url === '/healthz' || req.url === '/health') {
+      res.statusCode = 200;
+      res.end('ok');
+      return;
+    }
+    if (accessGate.handleHttp(req, res)) return;
+    handle(req, res);
+  });
+
 const parseCookies = (header) => {
   const raw = typeof header === "string" ? header : "";
   if (!raw.trim()) return {};
