@@ -114,16 +114,36 @@ async function main() {
 
   const httpsCert = useHttps ? await generateHttpsCert() : null;
 
+  // const createServer = () =>
+  //   useHttps
+  //     ? https.createServer(httpsCert, (req, res) => {
+  //         if (accessGate.handleHttp(req, res)) return;
+  //         handle(req, res);
+  //       })
+  //     : http.createServer((req, res) => {
+  //         if (accessGate.handleHttp(req, res)) return;
+  //         handle(req, res);
+  //       });
+
   const createServer = () =>
-    useHttps
-      ? https.createServer(httpsCert, (req, res) => {
-          if (accessGate.handleHttp(req, res)) return;
-          handle(req, res);
-        })
-      : http.createServer((req, res) => {
-          if (accessGate.handleHttp(req, res)) return;
-          handle(req, res);
-        });
+  http.createServer((req, res) => {
+    const pathname = resolvePathname(req.url);
+    
+    // Redirect unauthenticated users to /login instead of plain text
+    if (accessGate.enabled && !pathname.startsWith("/api/") && pathname !== "/login") {
+      const cookies = req.headers.cookie || "";
+      const hasToken = cookies.includes("studio_access=");
+      if (!hasToken) {
+        res.statusCode = 302;
+        res.setHeader("Location", "/login");
+        res.end();
+        return;
+      }
+    }
+    
+    if (accessGate.handleHttp(req, res)) return;
+    handle(req, res);
+  });
 
   const servers = hostnames.map(() => createServer());
 

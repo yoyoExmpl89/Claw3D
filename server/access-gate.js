@@ -119,6 +119,16 @@ function createAccessGate(options) {
     if (!enabled) return false;
     const auth = getAuthState(req);
     if (!auth.authorized) {
+
+      // Redirect to login page instead of plain text
+        if (!String(req.url || "/").startsWith("/api/") && 
+            !String(req.url || "/").startsWith("/login")) {
+          res.statusCode = 302;
+          res.setHeader("Location", "/login");
+          res.end();
+          return true;
+        }
+
       const statusCode = auth.limited ? 429 : 401;
       if (String(req.url || "/").startsWith("/api/")) {
         res.statusCode = statusCode;
