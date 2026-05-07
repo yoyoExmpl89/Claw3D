@@ -128,6 +128,8 @@ async function main() {
   const createServer = () =>
   http.createServer((req, res) => {
     const pathname = resolvePathname(req.url);
+
+
     
     // Redirect unauthenticated users to /login instead of plain text
     if (accessGate.enabled && !pathname.startsWith("/api/") && pathname !== "/login") {
@@ -141,7 +143,16 @@ async function main() {
       }
     }
     
-    if (accessGate.handleHttp(req, res)) return;
+    // if (accessGate.handleHttp(req, res)) return;
+    // handle(req, res);
+
+        // Allow /login and static assets to pass through without auth
+    const isPublicPath = 
+      pathname === "/login" ||
+      pathname.startsWith("/_next/") ||
+      pathname === "/favicon.ico";
+    
+    if (!isPublicPath && accessGate.handleHttp(req, res)) return;
     handle(req, res);
   });
 
