@@ -4,13 +4,27 @@ import { useState } from "react";
 export default function LoginPage() {
   const [token, setToken] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = () => {
     if (!token.trim()) {
       setError("Token required");
       return;
     }
+    setLoading(true);
+    
+    // Set cookie dengan domain yang benar
+    const domain = window.location.hostname;
     document.cookie = `studio_access=${token.trim()}; path=/; max-age=31536000; SameSite=Lax`;
+    
+    // Verify cookie was set
+    const cookieSet = document.cookie.includes("studio_access=");
+    if (!cookieSet) {
+      setError("Failed to set cookie. Try a different browser.");
+      setLoading(false);
+      return;
+    }
+    
     window.location.href = "/";
   };
 
@@ -26,8 +40,12 @@ export default function LoginPage() {
         style={{ padding: 8, width: 300, fontSize: 16 }}
       />
       {error && <p style={{ color: "red" }}>{error}</p>}
-      <button onClick={handleLogin} style={{ padding: "8px 24px", fontSize: 16 }}>
-        Enter
+      <button 
+        onClick={handleLogin} 
+        disabled={loading}
+        style={{ padding: "8px 24px", fontSize: 16, cursor: loading ? "wait" : "pointer" }}
+      >
+        {loading ? "Loading..." : "Enter"}
       </button>
     </div>
   );
