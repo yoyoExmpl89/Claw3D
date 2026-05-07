@@ -146,13 +146,21 @@ async function main() {
     // if (accessGate.handleHttp(req, res)) return;
     // handle(req, res);
 
-        // Allow /login and static assets to pass through without auth
+    // Whitelist paths yang tidak perlu auth
     const isPublicPath = 
       pathname === "/login" ||
-      pathname.startsWith("/_next/") ||
-      pathname === "/favicon.ico";
+      pathname.startsWith("/_next/static/") ||
+      pathname.startsWith("/_next/image/") ||
+      pathname.startsWith("/_next/webpack-hmr") ||
+      pathname === "/favicon.ico" ||
+      pathname === "/_next/data";
     
-    if (!isPublicPath && accessGate.handleHttp(req, res)) return;
+    if (isPublicPath) {
+      handle(req, res);
+      return;
+    }
+    
+    if (accessGate.handleHttp(req, res)) return;
     handle(req, res);
   });
 
