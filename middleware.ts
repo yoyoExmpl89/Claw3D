@@ -3,9 +3,11 @@ import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("studio_access")?.value;
-  const isLoginPage = request.nextUrl.pathname === "/login";
+  const pathname = request.nextUrl.pathname;
   
-  if (!token && !isLoginPage) {
+  const isPublic = pathname === "/login" || pathname.startsWith("/_next/");
+  
+  if (!isPublic && !token) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
   

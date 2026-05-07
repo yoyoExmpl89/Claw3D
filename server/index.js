@@ -127,41 +127,45 @@ async function main() {
 
   const createServer = () =>
   http.createServer((req, res) => {
-    const pathname = resolvePathname(req.url);
+    // const pathname = resolvePathname(req.url);
 
-
+    // console.log("REQUEST:", pathname);  // tambah ini
     
-    // Redirect unauthenticated users to /login instead of plain text
-    if (accessGate.enabled && !pathname.startsWith("/api/") && pathname !== "/login") {
-      const cookies = req.headers.cookie || "";
-      const hasToken = cookies.includes("studio_access=");
-      if (!hasToken) {
-        res.statusCode = 302;
-        res.setHeader("Location", "/login");
-        res.end();
-        return;
-      }
-    }
+    // // Redirect unauthenticated users to /login instead of plain text
+    // if (accessGate.enabled && !pathname.startsWith("/api/") && pathname !== "/login") {
+    //   const cookies = req.headers.cookie || "";
+    //   const hasToken = cookies.includes("studio_access=");
+    //   if (!hasToken) {
+    //     res.statusCode = 302;
+    //     res.setHeader("Location", "/login");
+    //     res.end();
+    //     return;
+    //   }
+    // }
+    
+    // // if (accessGate.handleHttp(req, res)) return;
+    // // handle(req, res);
+
+    // // Whitelist paths yang tidak perlu auth
+    // const isPublicPath = 
+    //   pathname === "/login" ||
+    //   pathname.startsWith("/_next/static/") ||
+    //   pathname.startsWith("/_next/image/") ||
+    //   pathname.startsWith("/_next/webpack-hmr") ||
+    //   pathname === "/favicon.ico" ||
+    //   pathname === "/_next/data";
+
+    // console.log("isPublicPath:", isPublicPath, pathname); // tambah ini  
+    
+    // if (isPublicPath) {
+    //   handle(req, res);
+    //   return;
+    // }
     
     // if (accessGate.handleHttp(req, res)) return;
-    // handle(req, res);
-
-    // Whitelist paths yang tidak perlu auth
-    const isPublicPath = 
-      pathname === "/login" ||
-      pathname.startsWith("/_next/static/") ||
-      pathname.startsWith("/_next/image/") ||
-      pathname.startsWith("/_next/webpack-hmr") ||
-      pathname === "/favicon.ico" ||
-      pathname === "/_next/data";
-    
-    if (isPublicPath) {
-      handle(req, res);
-      return;
-    }
-    
-    if (accessGate.handleHttp(req, res)) return;
     handle(req, res);
+
+
   });
 
   const servers = hostnames.map(() => createServer());
