@@ -66,7 +66,8 @@ const createFrameRateLimiter = (
 /**
  * Validate upstream URL against an allowlist.
  * If UPSTREAM_ALLOWLIST env var is set, only those hosts are permitted.
- * Format: comma-separated hostnames, e.g. "gateway.percival-labs.ai,localhost"
+ * Format: comma-separated hostnames or "*" to allow all.
+ * e.g. "gateway.percival-labs.ai,localhost" or "*"
  */
 const isUpstreamAllowed = (url) => {
   const allowlist = (process.env.UPSTREAM_ALLOWLIST || "").trim();
@@ -87,6 +88,12 @@ const isUpstreamAllowed = (url) => {
       .split(",")
       .map((h) => h.trim().toLowerCase())
       .filter(Boolean);
+
+    // Wildcard "*" permits any upstream host.
+    if (allowed.includes("*")) {
+      return true;
+    }
+
     const hostname = parsed.hostname.toLowerCase();
     if (!allowed.includes(hostname)) {
       console.warn(
