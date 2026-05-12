@@ -83,6 +83,22 @@ const readOpenclawGatewayDefaults = (env = process.env) => {
 };
 
 const loadUpstreamGatewaySettings = (env = process.env) => {
+  // ── Environment variable overrides ────────────────────────────────────────
+  const envUrl = (env.CLAW3D_GATEWAY_URL || env.NEXT_PUBLIC_GATEWAY_URL || "").trim();
+  const envToken = (env.STUDIO_ACCESS_TOKEN || env.CLAW3D_GATEWAY_TOKEN || "").trim();
+  const envAdapterType = (env.CLAW3D_GATEWAY_ADAPTER_TYPE || "hermes").trim();
+
+  if (envUrl) {
+    console.info(`[studio-settings] Using env-configured upstream: ${envUrl}`);
+    return {
+      url: envUrl,
+      token: envToken,
+      adapterType: envAdapterType,
+      settingsPath: null,
+    };
+  }
+  // ── End env var overrides ─────────────────────────────────────────────────
+
   const settingsPath = resolveStudioSettingsPath(env);
   const parsed = readJsonFile(settingsPath);
   const gateway = parsed && typeof parsed === "object" ? parsed.gateway : null;
@@ -95,20 +111,10 @@ const loadUpstreamGatewaySettings = (env = process.env) => {
   if (!token && adapterType === "openclaw") {
     const defaults = readOpenclawGatewayDefaults(env);
     if (defaults) {
-      return {
-        url: url || defaults.url,
-        token: defaults.token,
-        adapterType,
-        settingsPath,
-      };
+      return { url: url || defaults.url, token: defaults.token, adapterType, settingsPath };
     }
   }
-  return {
-    url: url || DEFAULT_GATEWAY_URL,
-    token,
-    adapterType,
-    settingsPath,
-  };
+  return { url: url || DEFAULT_GATEWAY_URL, token, adapterType, settingsPath };
 };
 
 module.exports = {
