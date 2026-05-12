@@ -29,7 +29,6 @@ const adapter = runProcess("hermes-adapter", "node", [
   path.join(__dirname, "hermes-gateway-adapter.js"),
 ]);
 
-// Give the adapter a moment to bind its port before starting the main server
 setTimeout(() => {
   console.log("[start] Starting Claw3D main server...");
   runProcess("claw3d", "node", [path.join(__dirname, "index.js")]);
