@@ -12,7 +12,7 @@
     "hermes-adapter": "node server/hermes-gateway-adapter.js",
     "demo-gateway": "node server/demo-gateway-adapter.js",
     "build": "next build",
-    "start": "node server/hermes-gateway-adapter.js & node server/index.js",
+    "start": "npx concurrently \"node server/hermes-gateway-adapter.js\" \"node server/index.js\"",
     "lint": "eslint .",
     "cleanup:ux-artifacts": "node scripts/cleanup-ux-artifacts.mjs",
     "sync:gateway-client": "node scripts/sync-openclaw-gateway-client.ts",
@@ -40,7 +40,8 @@
     "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.4.0",
     "three": "^0.183.2",
-    "ws": "^8.18.3"
+    "ws": "^8.18.3",
+    "concurrently": "^8.2.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.0",
